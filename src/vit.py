@@ -63,7 +63,7 @@ class MSA(torch.nn.Module):
         
         self.q_mappings = torch.nn.ModuleList([torch.nn.Linear(d_head, d_head) for _ in range(self.n_heads)])
         self.k_mappings = torch.nn.ModuleList([torch.nn.Linear(d_head, d_head) for _ in range(self.n_heads)])
-        self.v_mappings = torch.nn.ModuleLIst([torch.nn.Linear(d_head, d_head) for _ in range(self.n_heads)])
+        self.v_mappings = torch.nn.ModuleList([torch.nn.Linear(d_head, d_head) for _ in range(self.n_heads)])
         self.d_head = d_head
         self.softmax = torch.nn.Softmax(dim=-1)
         

@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.datasets import MNIST
 from tqdm import tqdm, trange
-from vit import ViT
+from src.vit import ViT
 
 def main(train_loader, test_loader):
     """
