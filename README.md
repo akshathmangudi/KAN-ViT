@@ -5,7 +5,8 @@ This is the official repository containing all details and code related to the p
 Control variables:
 - **Dataset used: MNIST**
 - **Optimizer: Adam, learning_rate = 0.005.**
-- **GPU Used: Tesla P100 and Tesla T4**
+- **Transformations: None**
+- **GPU Used: Tesla P100**
 
 ## Benchmark #1: Vanilla Testing
 Time Taken / Epoch: 
@@ -25,20 +26,43 @@ Time Taken / Epoch:
 ||
 
 ## Benchmark #2: Using Flash Attention
-The flash attention has been modified into Flash_KAN to suit our KAN_ViT. 
+The flash attention used for KAN_ViT, which contains MLP layers were replaced with KANLinear layers.  
 
 Time Taken / Epoch: 
 - Flash-ViT: ~2.1 minutes
-- Flash-KAN_ViT: NA
+- Flash-KAN_ViT: ~2.7 minutes
 
 | Model | Date of Training | #Epochs | Test Loss | Test Accuracy |
 |:-----:|:----------------:|:-------:|:---------:|:-------------:|
 | Vanilla ViT | 27-07-24 | 5 | 2.36 | 10.28% |
-| KAN-ViT | TBD | 5 | TBD | TBD | 
+| KAN-ViT | 27-07-24 | 5 | 1.79 | 76.00% | 
 | |
 | Vanilla ViT | TBD | 8 | TBD | TBD |
-| KAN-ViT | TBD | 8 | TBD | TBD | 
+| KAN-ViT | 28-07-24 | 8 | 1.68 | 78.34% | 
 | |
 | Vanilla ViT | TBD | 10 | TBD | TBD |
-| KAN-ViT | TBD | 10 | TBD | TBD | 
+| KAN-ViT | 28-07-24 | 10 | 1.62 | 84.50% | 
 ||
+
+## Benchmark #3: KAN Variants
+We will be using KAN variants in our Vision Transformers architecture and benchmark them against the test loss, test
+accuracy and time taken per epoch. 
+
+Control variables: 
+- **Number of Epochs: 10**
+- **Dataset used: MNIST**
+- **Transformations: None**
+
+**Note: All variant names listed below are accurate with respect to each adaptation listed in the references/works cited.**
+| Variant | Time Taken / Epoch | Test Loss | Test Accuracy |
+|:-----:|:------------------:|:---------:|:-------------:|
+| ChebyKAN | | |
+| FourierKAN | | |
+| FusedFourierKAN | | |
+| efficient-kan | | |
+| fast-kan | | | 
+| faster-kan | | |
+| pykan | | | 
+| RBF-KAN | | | 
+| Wav-KAN | | |
+
