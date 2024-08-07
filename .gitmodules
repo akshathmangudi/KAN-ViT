@@ -1,0 +1,15 @@
+[submodule "RBF-KAN"]
+	path = RBF-KAN
+	url = https://github.com/Sid2690/RBF-KAN.git
+[submodule "efficient-kan"]
+	path = efficient-kan
+	url = https://github.com/Blealtan/efficient-kan.git
+[submodule "fast-kan"]
+	path = fast-kan
+	url = https://github.com/ZiyaoLi/fast-kan.git
+[submodule "faster-kan"]
+	path = faster-kan
+	url = https://github.com/AthanasiosDelis/faster-kan.git
+[submodule "pykan"]
+	path = pykan
+	url = https://github.com/KindXiaoming/pykan.git

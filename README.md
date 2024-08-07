@@ -59,8 +59,8 @@ Control variables:
 | ChebyKAN | | |
 | FourierKAN | | |
 | FusedFourierKAN | | |
-| efficient-kan | | |
-| fast-kan | | | 
+| efficient-kan | ~29 minutes | 1.62 | 84.50% |
+| fast-kan | ~12 minutes | 1.66 | 80.14% | 
 | faster-kan | | |
 | pykan | | | 
 | RBF-KAN | | | 
