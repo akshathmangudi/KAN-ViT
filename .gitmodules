@@ -13,3 +13,9 @@
 [submodule "pykan"]
 	path = pykan
 	url = https://github.com/KindXiaoming/pykan.git
+[submodule "FourierKAN"]
+	path = FourierKAN
+	url = https://github.com/GistNoesis/FourierKAN.git
+[submodule "FlashAttention20"]
+	path = FlashAttention20
+	url = https://github.com/kyegomez/FlashAttention20.git
