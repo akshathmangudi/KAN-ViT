@@ -58,17 +58,20 @@ Control variables:
 - **Number of Epochs: 10**
 - **Dataset used: MNIST**
 - **Transformations: None**
+- **Optimizer: Adam, learning_rate = 0.005**
 
 **Note: All variant names listed below are accurate with respect to each adaptation listed in the references/works cited.**
 | Variant | Time Taken / Epoch | Test Loss | Test Accuracy |
 |:-----:|:------------------:|:---------:|:-------------:|
 | ChebyKAN | | |
-| FourierKAN (requires more testing) | ~12 minutes | 2.30 | 10.27% |
+| FourierKAN* | ~11.5 minutes | 2.23 | 20.33% |
 | FusedFourierKAN | | |
-| efficient-kan | ~29 minutes | 1.62 | 84.50% |
+| efficient-kan | ~31 minutes | 1.62 | 84.50% |
 | fast-kan | ~12 minutes | 1.66 | 80.14% | 
 | faster-kan | | |
 | pykan | | | 
 | RBF-KAN | | | 
 | Wav-KAN | | |
+
+asterisk(*) indicates that the variant is converging too slow and learning rate has to be increased. However, that has not been done for fair benchmarking.
 
