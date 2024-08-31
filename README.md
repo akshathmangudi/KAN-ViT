@@ -63,7 +63,7 @@ Control variables:
 **Note: All variant names listed below are accurate with respect to each adaptation listed in the references/works cited.**
 | Variant | Time Taken / Epoch | Test Loss | Test Accuracy |
 |:-----:|:------------------:|:---------:|:-------------:|
-| ChebyKAN | | |
+| ChebyKAN | ~11 minutes | 1.70 | 76.14% |
 | FourierKAN* | ~11.5 minutes | 2.23 | 20.33% |
 | FusedFourierKAN | | |
 | efficient-kan | ~31 minutes | 1.62 | 84.50% |

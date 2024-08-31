@@ -19,3 +19,6 @@
 [submodule "FlashAttention20"]
 	path = FlashAttention20
 	url = https://github.com/kyegomez/FlashAttention20.git
+[submodule "ChebyKAN"]
+	path = ChebyKAN
+	url = https://github.com/SynodicMonth/ChebyKAN.git
