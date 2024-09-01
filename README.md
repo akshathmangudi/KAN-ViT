@@ -4,50 +4,43 @@ This is the official repository containing all details and code related to the p
 
 Control variables:
 - **Dataset used: MNIST**
-- **Optimizer: Adam, learning_rate = 0.005.**
 - **Transformations: None**
-- **GPU Used: Tesla P100**
+- **GPU Used: Tesla A100**
 
 ## Benchmark #1: Vanilla Testing
 Time Taken / Epoch: 
-- Vanilla ViT: ~3.8 minutes. 
-- KAN-ViT: ~29 minutes. (7.6x longer)
+- Vanilla ViT: 
+- KAN-ViT: 
 
 | Model | Date of Training | #Epochs | Test Loss | Test Accuracy |
 |:-----:|:----------------:|:-------:|:---------:|:-------------:|
-| Vanilla ViT | 27-07-24 | 5 | 1.95 | 54.49% |
-| KAN-ViT | 03-08-24 | 5 | 1.85 | 61.41% | 
+| Vanilla ViT | | | | |
+| KAN-ViT | | | | | 
 | |
-| Vanilla ViT | 26-07-24 | 8 | 1.94 | 52.07% |
-| KAN-ViT | 26-07-24 | 8 | 1.67 | 79.44% |
+| Vanilla ViT | | | | |
+| KAN-ViT | | | | |
 | |
-| Vanilla ViT | 27-07-24 | 10 | 1.90 | 56.14% | 
-| KAN-ViT | 27-07-24 | 10 | 1.76 | 70.02% |
+| Vanilla ViT | | | | | 
+| KAN-ViT | | | | | 
 ||
 
 ## Benchmark #2: Using Flash Attention
-The flash attention used for KAN_ViT, which contains MLP layers were replaced with KANLinear layers.  
-
-NOTE: Because of the speed at which the model is converging, the model's learning rate has been modified from 0.005 to 2e-3 (OR) 0.002. 
-
-Control variables: 
-- **Dataset used: MNIST**
-- **Optimizer: Adam, learning_rate = 0.002.**
+The flash attention used for KAN_ViT, which contains MLP layers were replaced with KANLinear layers, taken from the efficient-kan repository.
 
 Time Taken / Epoch: 
-- Flash-ViT: ~2.1 minutes
-- Flash-KAN_ViT: ~2.7 minutes
+- Flash-ViT:
+- Flash-KAN_ViT: 
 
 | Model | Date of Training | #Epochs | Test Loss | Test Accuracy |
 |:-----:|:----------------:|:-------:|:---------:|:-------------:|
-| Vanilla ViT | 16-08-24 | 5 | 1.82 | 64.35% |
-| KAN-ViT | 17-08-24 | 5 | 1.96 | 49.65% | 
+| Vanilla ViT | | | | |
+| KAN-ViT | | | | | 
 | |
-| Vanilla ViT | 16-08-24 | 8 | 1.74 | 72.22% |
-| KAN-ViT | 17-08-24 | 8 | 1.85 | 61.63% | 
+| Vanilla ViT | | | | |
+| KAN-ViT | | | | | 
 | |
-| Vanilla ViT | 16-08-24 | 10 | 1.71 | 74.83% |
-| KAN-ViT | 17-08-24 | 10 | 1.77 | 69.01% | 
+| Vanilla ViT | | | | |
+| KAN-ViT | | | | | 
 ||
 
 ## Benchmark #3: KAN Variants
@@ -58,20 +51,20 @@ Control variables:
 - **Number of Epochs: 10**
 - **Dataset used: MNIST**
 - **Transformations: None**
-- **Optimizer: Adam, learning_rate = 0.005**
 
 **Note: All variant names listed below are accurate with respect to each adaptation listed in the references/works cited.**
-| Variant | Time Taken / Epoch | Test Loss | Test Accuracy |
-|:-----:|:------------------:|:---------:|:-------------:|
-| ChebyKAN | ~11 minutes | 1.70 | 76.14% |
-| FourierKAN* | ~11.5 minutes | 2.23 | 20.33% |
-| FusedFourierKAN | | |
-| efficient-kan | ~31 minutes | 1.62 | 84.50% |
-| fast-kan | ~12 minutes | 1.66 | 80.14% | 
-| faster-kan | | |
-| pykan | | | 
-| RBF-KAN | | | 
-| Wav-KAN | | |
+| Variant | Date of Training | Time Taken / Epoch | Test Loss | Test Accuracy |
+|:-----:|:------------------:|:------------------:|:---------:|:-------------:|
+| ChebyKAN | | | | | 
+| FourierKAN* | | | | |
+| FusedFourierKAN | | | | |
+| efficient-kan | | | | |
+| fast-kan | | | | |
+| faster-kan | | | | |
+| pykan | | | | |
+| RBF-KAN | | | | |
+| Wav-KAN | | | | |
+| SineKAN | | | | |
 
 asterisk(*) indicates that the variant is converging too slow and learning rate has to be increased. However, that has not been done for fair benchmarking.
 
