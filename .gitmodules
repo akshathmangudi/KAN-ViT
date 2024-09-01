@@ -22,3 +22,6 @@
 [submodule "ChebyKAN"]
 	path = ChebyKAN
 	url = https://github.com/SynodicMonth/ChebyKAN.git
+[submodule "SineKAN"]
+	path = SineKAN
+	url = https://github.com/ereinha/SineKAN.git
