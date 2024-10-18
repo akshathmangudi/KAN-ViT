@@ -3,14 +3,14 @@
 This is the official repository containing all details and code related to the project currently in progress, which is benchmarking KAN-based Vision Transformers versus the vanilla Vision Transformers from this [paper](https://arxiv.org/abs/2010.11929).
 
 Control variables:
-- **Dataset used: MNIST**
+- **Dataset used: CIFAR**
 - **Transformations: None**
-- **GPU Used: Tesla A100**
+- **GPU Used: Tesla P100**
 
 ## Benchmark #1: Vanilla Testing
 Time Taken / Epoch: 
 - Vanilla ViT: 
-- KAN-ViT: 
+- KAN-ViT: 25 minutes. 
 
 | Model | Date of Training | #Epochs | Test Loss | Test Accuracy |
 |:-----:|:----------------:|:-------:|:---------:|:-------------:|
@@ -21,7 +21,7 @@ Time Taken / Epoch:
 | KAN-ViT | | | | |
 | |
 | Vanilla ViT | | | | | 
-| KAN-ViT | | | | | 
+| KAN-ViT | 18-10-2024 | | | | 
 ||
 
 ## Benchmark #2: Using Flash Attention

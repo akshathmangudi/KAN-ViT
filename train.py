@@ -44,7 +44,7 @@ def main(train_loader, test_loader, epochs: int, device, type: str = "vanilla"):
     optimizer = Adam(mnist_model.parameters(), lr=0.001)
 
     # Create a unique filename for this run
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     log_filename = f"mnist_metrics_{timestamp}.txt"
 
     for epoch in trange(epochs, desc="train"):
