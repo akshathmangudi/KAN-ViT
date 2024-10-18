@@ -38,10 +38,10 @@ class VisionTransformer(torch.nn.Module):
         self.input_d = int(chw[0] * self.patch_size[0] * self.patch_size[1])
         if type == "vanilla" or type == "flash-attn":
             self.linear_mapper = torch.nn.Linear(
-                self.input_d, self.d_hidden, grid_size=28)
+                self.input_d, self.d_hidden)
         elif type == "efficientkan":
             self.linear_mapper = KANLinear(
-                self.input_d, self.d_hidden, grid_size=28)
+                self.input_d, self.d_hidden)
         elif type == "sine":
             self.linear_mapper = SineKANLayer(
                 self.input_d, self.d_hidden, grid_size=28)
@@ -52,7 +52,7 @@ class VisionTransformer(torch.nn.Module):
             self.linear_mapper = ChebyKANLayer(self.input_d, self.d_hidden, 4)
         elif type == "fast":
             self.linear_mapper = FastKANLayer(
-                self.input_d, self.d_hidden, grid_size=28)
+                self.input_d, self.d_hidden)
         else:
             print("Variant not available.")
 
