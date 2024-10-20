@@ -14,11 +14,11 @@ Time Taken / Epoch:
 
 | Model | Date of Training | #Epochs | Test Loss | Test Accuracy |
 |:-----:|:----------------:|:-------:|:---------:|:-------------:|
-| Vanilla ViT | | | | |
+| Vanilla ViT | 20-10-2024 | 5 | 2.16 | 29.2% |
 | KAN-ViT | 19-10-2024 | 5 | 2.12 | 33.0% | 
 | |
 | Vanilla ViT | 19-10-2024 | 8 | 2.15 | 29.6% |
-| KAN-ViT | 19-10-2024 | 8 | | |
+| KAN-ViT | 19-10-2024 | 8 | 2.09 | 36.0% |
 | |
 | Vanilla ViT | 18-10-2024 | 10 | 2.11 | 34.1% | 
 | KAN-ViT | 18-10-2024 | 10 | 2.08 | 37.3% | 
