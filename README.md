@@ -9,19 +9,19 @@ Control variables:
 
 ## Benchmark #1: Vanilla Testing
 Time Taken / Epoch: 
-- Vanilla ViT: 
+- Vanilla ViT: 5 minutes.
 - KAN-ViT: 25 minutes. 
 
 | Model | Date of Training | #Epochs | Test Loss | Test Accuracy |
 |:-----:|:----------------:|:-------:|:---------:|:-------------:|
 | Vanilla ViT | | | | |
-| KAN-ViT | | | | | 
+| KAN-ViT | 19-10-2024 | 5 | 2.12 | 33.0% | 
 | |
-| Vanilla ViT | | | | |
-| KAN-ViT | | | | |
+| Vanilla ViT | 19-10-2024 | 8 | 2.15 | 29.6% |
+| KAN-ViT | 19-10-2024 | 8 | | |
 | |
-| Vanilla ViT | | | | | 
-| KAN-ViT | 18-10-2024 | | | | 
+| Vanilla ViT | 18-10-2024 | 10 | 2.11 | 34.1% | 
+| KAN-ViT | 18-10-2024 | 10 | 2.08 | 37.3% | 
 ||
 
 ## Benchmark #2: Using Flash Attention

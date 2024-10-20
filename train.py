@@ -38,10 +38,12 @@ def main(train_loader, test_loader, epochs: int, device, type: str = "vanilla"):
     print("Using device: ", device,
           f"({torch.cuda.get_device_name(device)})" if torch.cuda.is_available() else "")
 
-    mnist_model = VisionTransformer(
-        (1, 28, 28), n_patches=7, n_blocks=2, d_hidden=8, n_heads=2, out_d=10, type=type).to(device)
+    # mnist_model = VisionTransformer(
+    #    (1, 28, 28), n_patches=7, n_blocks=2, d_hidden=8, n_heads=2, out_d=10, type=type).to(device)
+    cifar10_model = VisionTransformer(
+        (3, 32, 32), n_patches=8, n_blocks=2, hidden_d=8, n_heads=2, out_d=10).to(device)
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = Adam(mnist_model.parameters(), lr=0.001)
+    optimizer = Adam(cifar10_model.parameters(), lr=0.001)
 
     # Create a unique filename for this run
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -51,11 +53,11 @@ def main(train_loader, test_loader, epochs: int, device, type: str = "vanilla"):
         train_loss = 0.0
         y_true_train, y_pred_train, y_pred_proba_train = [], [], []
 
-        mnist_model.train()
+        cifar10_model.train()
         for batch in tqdm(train_loader, desc=f"Epoch {epoch + 1} in training", leave=False):
             x, y = batch
             x, y = x.to(device), y.to(device)
-            y_hat = mnist_model(x)
+            y_hat = cifar10_model(x)
             loss = criterion(y_hat, y)
 
             train_loss += loss.detach().cpu().item() / len(train_loader)
@@ -85,7 +87,7 @@ def main(train_loader, test_loader, epochs: int, device, type: str = "vanilla"):
                          train_loss, accuracy, balanced_accuracy, f1, roc_auc)
 
     # Testing
-    mnist_model.eval()
+    cifar10_model.eval()
     with torch.no_grad():
         test_loss = 0.0
         y_true_test, y_pred_test, y_pred_proba_test = [], [], []
@@ -93,7 +95,7 @@ def main(train_loader, test_loader, epochs: int, device, type: str = "vanilla"):
         for batch in tqdm(test_loader, desc="Testing"):
             x, y = batch
             x, y = x.to(device), y.to(device)
-            y_hat = mnist_model(x)
+            y_hat = cifar10_model(x)
             loss = criterion(y_hat, y)
             test_loss += loss.detach().cpu().item() / len(test_loader)
 
@@ -120,11 +122,16 @@ def main(train_loader, test_loader, epochs: int, device, type: str = "vanilla"):
 
 if __name__ == "__main__":
     transform = transforms.ToTensor()
-    train_mnist = MNIST(root='./mnist', train=True,
-                        download=True, transform=transform)
-    test_mnist = MNIST(root='./mnist', train=False,
-                       download=True, transform=transform)
-    train_loader = DataLoader(train_mnist, shuffle=True, batch_size=128)
-    test_loader = DataLoader(test_mnist, shuffle=False, batch_size=128)
+    # train_mnist = MNIST(root='./mnist', train=True,
+    #                     download=True, transform=transform)
+    # test_mnist = MNIST(root='./mnist', train=False,
+    #                    download=True, transform=transform)
+
+    train_cifar = CIFAR10(root='./cifar', train=True,
+                          download=True, transform=transform)
+    test_cifar = CIFAR10(root='./cifar', train=False,
+                         download=True, transform=transform)
+    train_loader = DataLoader(train_cifar, shuffle=True, batch_size=128)
+    test_loader = DataLoader(test_cifar, shuffle=False, batch_size=128)
     main(train_loader=train_loader,
          test_loader=test_loader, epochs=5, device="cuda", type="vanilla")

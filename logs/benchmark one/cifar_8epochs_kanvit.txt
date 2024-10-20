@@ -1,0 +1,14 @@
+Epoch: 8, Phase: Train
+    Loss: 2.0886
+    Accuracy: 0.3650
+    Balanced Accuracy: 0.3650
+    F1 Score: 0.3493
+    ROC AUC: 0.7315
+
+Test:
+    Loss: 2.0924
+    Accuracy: 0.3604
+    Balanced Accuracy: 0.3604
+    F1 Score: 0.3492
+    ROC AUC: 0.7364
+
