@@ -39,8 +39,8 @@ Time Taken / Epoch:
 | Vanilla ViT | 16-08-2024 | 8 | 72.22% |
 | KAN-ViT | 17-08-2024 | 8 | 61.63% | 
 | |
-| Vanilla ViT | 16-08-2024 | 74.83% |
-| KAN-ViT | 17-08-2024 | 69.01% |
+| Vanilla ViT | 16-08-2024 | 10 | 74.83% |
+| KAN-ViT | 17-08-2024 | 10 | 69.01% |
 ||
 
 ## Benchmark #3: KAN Variants
