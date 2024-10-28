@@ -20,7 +20,7 @@ Time Taken / Epoch:
 | Vanilla ViT | 26-07-2024 | 8 | 52.07% |
 | KAN-ViT | 26-07-2024 | 8 | 79.44% |
 | |
-| Vanilla ViT | 27-07-2024 | 10 | 34.1% | 
+| Vanilla ViT | 27-07-2024 | 10 | 56.14% | 
 | KAN-ViT | 27-07-2024 | 10 | 82.14% | 
 ||
 
@@ -55,11 +55,11 @@ Control variables:
 **Note: All variant names listed below are accurate with respect to each adaptation listed in the references/works cited.**
 | Variant | Date of Training | Time Taken / Epoch | Test Accuracy |
 |:-----:|:------------------:|:------------------:|:-------------:|
-| ChebyKAN | | | |
+| ChebyKAN | 28-10-2024 | ~ 11 minutes | 76.14% |
 | FourierKAN* | | | |
 | efficient-kan | 27-10-2024 | ~ 30 minutes | 84.50% |
 | fast-kan | 27-10-2024 | ~ 12 minutes | 80.14% |
-| SineKAN | | | |
+| SineKAN | 28-10-2024 | ~ 11 minutes | 62.53% |
 | |
 
 asterisk(*) indicates that the variant is converging too slow and learning rate has to be increased. However, that has not been done for fair benchmarking.
