@@ -1,7 +1,11 @@
 import torch
 import numpy
 from attention import FlashAttention, MSA
-from variants import SineKANLayer, NaiveFourierKANLayer, FastKANLayer, KANLinear, ChebyKANLayer
+from models.cheby import ChebyKANLayer
+from models.effkan import KANLinear
+from models.fastkan import FastKANLayer
+from models.nfkan import NaiveFourierKANLayer
+from models.sinekan import SineKANLayer
 
 
 class VisionTransformer(torch.nn.Module):
