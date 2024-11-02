@@ -45,16 +45,16 @@ Time Taken / Epoch:
 - Vanilla ViT: ~ 4 minutes.
 - KAN-ViT: ~ 29 minutes. (7.6x longer)
 
-| Model | Date of Training | #Epochs | Test Accuracy |
-|:-----:|:----------------:|:-------:|:-------------:|
-| Vanilla ViT | 27-07-2024 | 5 | 54.49% |
-| KAN-ViT | 03-08-2024 | 5 | 61.41% | 
+| Model | Date of Training | #Epochs | Test Accuracy | Balanced Test Accuracy | F1 Score | ROC/AUC Score |
+|:-----:|:----------------:|:-------:|:-------------:|:----------------------:|:--------:|:-------------:|
+| Vanilla ViT | 27-07-2024 | 5 | 52.48% | 51.42% | 0.497 | 0.815 |
+| KAN-ViT | 03-08-2024 | 5 | 61.24% | 60.42% | 0.612 | 0.879 |
 | |
-| Vanilla ViT | 26-07-2024 | 8 | 52.07% |
-| KAN-ViT | 26-07-2024 | 8 | 79.44% |
+| Vanilla ViT | 26-07-2024 | 8 | 49.44% | 48.45% | 0.465 | 0.809 |
+| KAN-ViT | 26-07-2024 | 8 | 79.44% | 78.97% | 0.792 | 0.935 |
 | |
-| Vanilla ViT | 27-07-2024 | 10 | 56.14% | 
-| KAN-ViT | 27-07-2024 | 10 | 82.14% | 
+| Vanilla ViT | 27-07-2024 | 10 | 56.78% | 55.64% | 0.543 | 0.830 | 
+| KAN-ViT | 27-07-2024 | 10 | 82.14% | 82.01% | 0.818 | 0.950 |
 ||
 
 ## Benchmark #2: Using Flash Attention
@@ -64,16 +64,16 @@ Time Taken / Epoch:
 - Flash-ViT: ~ 2 minutes.
 - Flash-KAN_ViT: ~ 3 minutes.
 
-| Model | Date of Training | #Epochs | Test Accuracy |
-|:-----:|:----------------:|:-------:|:-------------:|
-| Vanilla ViT | 16-08-2024 | 5 | 64.35% |
-| KAN-ViT | 17-08-2024 | 5 | 49.65% | 
+| Model | Date of Training | #Epochs | Test Accuracy | Balanced Test Accuracy | F1 Score | ROC/AUC Score |
+|:-----:|:----------------:|:-------:|:-------------:|:----------------------:|:--------:|:-------------:|
+| Vanilla ViT | 16-08-2024 | 5 | 64.35% | 63.38% | 0.609 | 0.886 |
+| KAN-ViT | 17-08-2024 | 5 | 68.92% | 67.89% | 0.667 | 0.889 | 
 | |
-| Vanilla ViT | 16-08-2024 | 8 | 72.22% |
-| KAN-ViT | 17-08-2024 | 8 | 61.63% | 
+| Vanilla ViT | 16-08-2024 | 8 | 78.42% | 78.05% | 0.782 | 0.945 |
+| KAN-ViT | 17-08-2024 | 8 | 75.20% | 74.12% | 0.724 | 0.911 | 
 | |
-| Vanilla ViT | 16-08-2024 | 10 | 74.83% |
-| KAN-ViT | 17-08-2024 | 10 | 69.01% |
+| Vanilla ViT | 16-08-2024 | 10 | 83.00% | 82.78% | 0.829 | 0.958 |
+| KAN-ViT | 17-08-2024 | 10 | 67.31% | 66.19% | 0.643 | 0.882 |
 ||
 
 ## Benchmark #3: KAN Variants
@@ -88,13 +88,13 @@ Control variables:
 NOTE: A handful of learning rates were picked out of the range and the result was added below based on performance
 
 **Note: All variant names listed below are accurate with respect to each adaptation listed in the references/works cited.**
-| Variant | Date of Training | Time Taken / Epoch | Test Accuracy |
-|:-----:|:------------------:|:------------------:|:-------------:|
-| ChebyKAN | 28-10-2024 | ~ 11 minutes | 76.14% |
-| FourierKAN | 29-10-2024 | ~ 5 minutes | 60.10% |
-| efficient-kan | 27-10-2024 | ~ 30 minutes | 84.50% |
-| fast-kan | 27-10-2024 | ~ 12 minutes | 80.14% |
-| SineKAN | 28-10-2024 | ~ 11 minutes | 62.53% |
+| Variant | Date of Training | Time Taken / Epoch | Test Accuracy | Balanced Test Accuracy | F1 Score | ROC/AUC Score |
+|:-------:|:----------------:|:-------:|:-------------:|:----------------------:|:--------:|:-------------:|
+| ChebyKAN | 28-10-2024 | ~ 11 minutes | 76.14% | 75.95% | 0.759 | 0.952 |
+| FourierKAN | 29-10-2024 | ~ 5 minutes | 53.53% | 53.08% | 0.527 | 0.832 |
+| efficient-kan | 27-10-2024 | ~ 30 minutes | 75.01% | 74.46% | 0.753 | 0.930 |
+| fast-kan | 27-10-2024 | ~ 12 minutes | 80.14% | 79.12% | 0.805 | 0.934 |
+| SineKAN | 28-10-2024 | ~ 11 minutes | 62.38% | 61.84% | 0.618 | 0.889 |
 | |
 
 ## License
