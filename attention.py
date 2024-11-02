@@ -103,6 +103,10 @@ class MSA(torch.nn.Module):
 
         d_head = int(d / n_heads)
 
+        """
+        KANLinear, FastKANLayer, SineKANLayer, ChebyKANLayer have been adopted from the 
+        respective submodules linked inside the repo. Credit can be viewed inside model.py
+        """
         try:
             if type in ["vanilla", "flash-attn", "fourier"]:
                 self.q_mappings = torch.nn.ModuleList(

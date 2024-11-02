@@ -39,6 +39,13 @@ class VisionTransformer(torch.nn.Module):
         self.patch_size = (chw[1] / n_patches, chw[2] / n_patches)
 
         # Linear mapping
+        """
+        We've done plug and play on the Vision Transformers architecture. Only the MLPs 
+        inside the attention layer and the linear mapper have been replaced with the KAN 
+        variants that we have discussed in the paper. Original credit goes to the authors
+        who created these variants, whose code has been linked as a submodule inside this 
+        repo.
+        """
         self.input_d = int(chw[0] * self.patch_size[0] * self.patch_size[1])
         try:
             if type == "vanilla" or type == "flash-attn":

@@ -11,6 +11,7 @@ from utils import calculate_metrics, save_metrics
 
 
 def main(train_loader, test_loader, epochs: int, device, type: str = "vanilla"):
+    flag = 0
     print("Using device: ", device,
           f"({torch.cuda.get_device_name(device)})" if torch.cuda.is_available() else "")
 
@@ -56,11 +57,12 @@ def main(train_loader, test_loader, epochs: int, device, type: str = "vanilla"):
 
         if epoch == epochs - 1:
             save_metrics(log_filename, epoch + 1, "Train",
-                         train_loss, accuracy, balanced_accuracy, f1, roc_auc)
+                         train_loss, accuracy, balanced_accuracy, f1, roc_auc, flag)
 
     # Testing
     mnist_model.eval()
     with torch.no_grad():
+        flag = 1
         test_loss = 0.0
         y_true_test, y_pred_test, y_pred_proba_test = [], [], []
 
@@ -87,7 +89,7 @@ def main(train_loader, test_loader, epochs: int, device, type: str = "vanilla"):
         print(f"  Test ROC AUC: {roc_auc:.4f}")
 
         save_metrics(log_filename, epochs, "Test", test_loss,
-                     accuracy, balanced_accuracy, f1, roc_auc)
+                     accuracy, balanced_accuracy, f1, roc_auc, flag)
 
 
 if __name__ == "__main__":

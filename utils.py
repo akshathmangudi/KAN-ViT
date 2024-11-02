@@ -21,15 +21,23 @@ def calculate_metrics(y_true, y_pred, y_pred_proba):
     return accuracy, balanced_accuracy, f1, roc_auc
 
 
-def save_metrics(filename, epoch, phase, loss, accuracy, balanced_accuracy, f1, roc_auc):
+def save_metrics(filename, epoch, phase, loss, accuracy, balanced_accuracy, f1, roc_auc, flag):
     os.makedirs('logs', exist_ok=True)
     with open(f'logs/{filename}', 'a') as f:
-        f.write(f"Epoch: {epoch}, Phase: {phase}\n")
-        f.write(f"  Loss: {loss:.4f}\n")
-        f.write(f"  Accuracy: {accuracy:.4f}\n")
-        f.write(f"  Balanced Accuracy: {balanced_accuracy:.4f}\n")
-        f.write(f"  F1 Score: {f1:.4f}\n")
-        f.write(f"  ROC AUC: {roc_auc:.4f}\n\n")
+        if flag == 0:
+            f.write(f"Epoch: {epoch}, Phase: {phase}\n")
+            f.write(f"  Loss: {loss:.4f}\n")
+            f.write(f"  Accuracy: {accuracy:.4f}\n")
+            f.write(f"  Balanced Accuracy: {balanced_accuracy:.4f}\n")
+            f.write(f"  F1 Score: {f1:.4f}\n")
+            f.write(f"  ROC AUC: {roc_auc:.4f}\n\n")
+        else:
+            f.write(f"Phase: {phase}\n")
+            f.write(f"  Loss: {loss:.4f}\n")
+            f.write(f"  Accuracy: {accuracy:.4f}\n")
+            f.write(f"  Balanced Accuracy: {balanced_accuracy:.4f}\n")
+            f.write(f"  F1 Score: {f1:.4f}\n")
+            f.write(f"  ROC AUC: {roc_auc:.4f}\n\n")
 
 
 def exists(val):
