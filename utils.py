@@ -1,14 +1,40 @@
 import os
 import math
 import torch
-import config
+import datetime
+import logging
 from torch import einsum
 from einops import rearrange
 from torch.autograd.function import Function
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score, roc_auc_score
+EPSILON = 1e-10
 
 
 def calculate_metrics(y_true, y_pred, y_pred_proba):
+    """
+    Calculate the accuracy, balanced accuracy, F1 score, and ROC AUC score 
+    between the true labels and the predicted labels.
+
+    Parameters
+    ----------
+    y_true : array_like
+        The true labels.
+    y_pred : array_like
+        The predicted labels.
+    y_pred_proba : array_like
+        The predicted probabilities.
+
+    Returns
+    -------
+    accuracy : float
+        The accuracy score.
+    balanced_accuracy : float
+        The balanced accuracy score.
+    f1 : float
+        The F1 score.
+    roc_auc : float
+        The ROC AUC score.
+    """
     accuracy = accuracy_score(y_true, y_pred)
     balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
     f1 = f1_score(y_true, y_pred, average='weighted')
@@ -22,6 +48,34 @@ def calculate_metrics(y_true, y_pred, y_pred_proba):
 
 
 def save_metrics(filename, epoch, phase, loss, accuracy, balanced_accuracy, f1, roc_auc, flag):
+    """
+    Save training or validation metrics to a log file.
+
+    Parameters
+    ----------
+    filename : str
+        The name of the file to which metrics will be appended.
+    epoch : int
+        The current epoch number.
+    phase : str
+        The phase of training (e.g., 'Train' or 'Validation').
+    loss : float
+        The loss value for the epoch.
+    accuracy : float
+        The accuracy score for the epoch.
+    balanced_accuracy : float
+        The balanced accuracy score for the epoch.
+    f1 : float
+        The F1 score for the epoch.
+    roc_auc : float
+        The ROC AUC score for the epoch.
+    flag : int
+        A flag to indicate whether to include the epoch number in the log entry.
+
+    This function creates a 'logs' directory if it does not exist and appends
+    the provided metrics to the specified log file. If the flag is 0, the epoch
+    number is included in the log entry; otherwise, it is omitted.
+    """
     os.makedirs('logs', exist_ok=True)
     with open(f'logs/{filename}', 'a') as f:
         if flag == 0:
@@ -40,11 +94,40 @@ def save_metrics(filename, epoch, phase, loss, accuracy, balanced_accuracy, f1, 
             f.write(f"  ROC AUC: {roc_auc:.4f}\n\n")
 
 
+# the lines of code below have been taken from https://github.com/kyegomez/FlashAttention20/blob/main/attention.py
 def exists(val):
+    """
+    Check if the given value is not None.
+
+    Parameters
+    ----------
+    val : any type
+        The value to be checked.
+
+    Returns
+    -------
+    bool
+        True if the value is not None, otherwise False.
+    """
     return val is not None
 
 
 def default(val, d):
+    """
+    Return the given value if it is not None, otherwise return the default.
+
+    Parameters
+    ----------
+    val : any type
+        The value to be checked.
+    d : any type
+        The default value to be returned if the given value is None.
+
+    Returns
+    -------
+    any type
+        The given value if it is not None, otherwise the default.
+    """
     return val if exists(val) else d
 
 
@@ -120,7 +203,7 @@ class FlashAttentionFunction(Function):
                     exp_weights.masked_fill_(~col_mask, 0.)
 
                 block_row_sums = exp_weights.sum(
-                    dim=-1, keepdims=True).clamp(min=config.EPSILON)
+                    dim=-1, keepdims=True).clamp(min=EPSILON)
 
                 exp_values = einsum(
                     '... i j, ... j d -> ... i d', exp_weights, vc)
@@ -210,3 +293,36 @@ class FlashAttentionFunction(Function):
                 dvc.add_(dv_chunk)
 
         return dq, dk, dv, None, None, None, None
+
+
+def setup_logging(log_dir='logs'):
+    """
+    Set up logging configuration.
+
+    Create a directory for storing logs with the current timestamp, and
+    configure the logging module to write log messages to both the
+    console and a file in the log directory.
+
+    Parameters
+    ----------
+    log_dir : str
+        The directory to store log files. Defaults to 'logs'.
+
+    Returns
+    -------
+    log_filename : str
+        The filename of the log file.
+    """
+    os.makedirs(log_dir, exist_ok=True)
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    log_filename = os.path.join(log_dir, f'training_{timestamp}.log')
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_filename),
+            logging.StreamHandler()
+        ]
+    )
+    return os.path.join(log_dir, f'mnist_metrics_{timestamp}.txt')

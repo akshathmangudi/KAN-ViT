@@ -4,6 +4,22 @@ import numpy
 
 class NaiveFourierKANLayer(torch.nn.Module):
     def __init__(self, inputdim, outdim, gridsize, addbias=True, smootorch_initialization=False):
+        """
+        Constructor for NaiveFourierKANLayer.
+
+        Parameters
+        ----------
+        inputdim : int
+            The number of input dimensions.
+        outdim : int
+            The number of output dimensions.
+        gridsize : int
+            The number of grid points to use for the Fourier transform.
+        addbias : bool, optional
+            Whether to include a bias term in the layer. Defaults to True.
+        smootorch_initialization : bool, optional
+            Whether to use the initialization scheme for the Fourier coefficients. Defaults to False.
+        """
         super(NaiveFourierKANLayer, self).__init__()
         self.gridsize = gridsize
         self.addbias = addbias

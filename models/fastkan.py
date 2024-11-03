@@ -42,6 +42,17 @@ class FastKANLayer(nn.Module):
         base_activation=F.silu,
         spline_weight_init_scale: float = 0.1,
     ) -> None:
+        """
+        Args:
+            input_dim (int): Input dimensionality
+            output_dim (int): Output dimensionality
+            grid_min (float, optional): Minimum of the grid. Defaults to -2..
+            grid_max (float, optional): Maximum of the grid. Defaults to 2..
+            num_grids (int, optional): Number of grids. Defaults to 8.
+            use_base_update (bool, optional): Whether to use a base update. Defaults to True.
+            base_activation (nn.Module, optional): Activation function for the base update. Defaults to F.silu.
+            spline_weight_init_scale (float, optional): Scale of the initialization of the spline weights. Defaults to 0.1.
+        """
         super().__init__()
         self.layernorm = nn.LayerNorm(input_dim)
         self.rbf = RadialBasisFunction(grid_min, grid_max, num_grids)

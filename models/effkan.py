@@ -20,6 +20,21 @@ class KANLinear(torch.nn.Module):
         grid_eps=0.02,
         grid_range=[-1, 1],
     ):
+        """
+        Args:
+            in_features: The number of input features of the layer.
+            out_features: The number of output features of the layer.
+            grid_size: The number of grid points used in the spline interpolation.
+            spline_order: The order of the spline interpolation.
+            scale_noise: The scale of the noise added to the spline weights.
+            scale_base: The scale of the base layer.
+            scale_spline: The scale of the spline layer.
+            enable_standalone_scale_spline: Whether to use a standalone scale
+                parameter for the spline layer.
+            base_activation: The activation function for the base layer.
+            grid_eps: The epsilon value used in the grid computation.
+            grid_range: The range of the grid points.
+        """
         super(KANLinear, self).__init__()
         self.in_features = in_features
         self.out_features = out_features

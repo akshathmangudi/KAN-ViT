@@ -9,6 +9,19 @@ import torch.nn.functional as F
 
 class ChebyKANLayer(nn.Module):
     def __init__(self, input_dim, output_dim, degree):
+        """
+        Initializes the ChebyKANLayer with the given input dimension, output dimension, 
+        and polynomial degree. This layer uses Chebyshev polynomials for function approximation.
+
+        Parameters
+        ----------
+        input_dim : int
+            The number of input features.
+        output_dim : int
+            The number of output features.
+        degree : int
+            The degree of the Chebyshev polynomial used in the layer.
+        """
         super(ChebyKANLayer, self).__init__()
         self.inputdim = input_dim
         self.outdim = output_dim

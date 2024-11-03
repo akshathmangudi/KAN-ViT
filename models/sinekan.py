@@ -5,6 +5,19 @@ import torch
 
 
 def forward_step(i_n, grid_size, A, K, C):
+    """
+    Computes the next step in a sequence using the given parameters.
+
+    Args:
+        i_n (torch.Tensor): The current input tensor.
+        grid_size (int): The size of the grid.
+        A (float): A scaling factor for the grid size.
+        K (float): An exponent applied to the grid size.
+        C (float): A constant added to the scaled grid size.
+
+    Returns:
+        torch.Tensor: The computed output tensor for the next step.
+    """
     ratio = A * grid_size**(-K) + C
     i_n1 = ratio * i_n
     return i_n1
@@ -12,6 +25,18 @@ def forward_step(i_n, grid_size, A, K, C):
 
 class SineKANLayer(torch.nn.Module):
     def __init__(self, input_dim, output_dim, device='cuda', grid_size=5, is_first=False, add_bias=True, norm_freq=True):
+        """
+        Initializes the SineKAN layer.
+
+        Args:
+            input_dim (int): The input dimensionality.
+            output_dim (int): The output dimensionality.
+            device (str): The device to put the layer on.
+            grid_size (int): The grid size for the sine functions.
+            is_first (bool): Whether this is the first layer in the network.
+            add_bias (bool): Whether to add a bias term to the layer.
+            norm_freq (bool): Whether to normalize the frequency of the sine functions.
+        """
         super(SineKANLayer, self).__init__()
         self.grid_size = grid_size
         self.device = device
@@ -64,3 +89,21 @@ class SineKANLayer(torch.nn.Module):
             y += self.bias
         y = torch.reshape(y, output_shape)
         return y
+
+    def forward_step(self, i_n, grid_size, A, K, C):
+        """
+        Computes the next step in a sequence using the given parameters.
+
+        Args:
+            i_n (torch.Tensor): The current input tensor.
+            grid_size (int): The size of the grid.
+            A (float): A scaling factor for the grid size.
+            K (float): An exponent applied to the grid size.
+            C (float): A constant added to the scaled grid size.
+
+        Returns:
+            torch.Tensor: The computed output tensor for the next step.
+        """
+        ratio = A * grid_size**(-K) + C
+        i_n1 = ratio * i_n
+        return i_n1

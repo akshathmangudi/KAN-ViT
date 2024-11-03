@@ -23,6 +23,19 @@ class FlashAttention(nn.Module):
         parallel=False,
         mixed_precision=False
     ):
+        """
+        __init__ method for FlashAttention.
+
+        :param dim: The embedding dimension (channels) of the input data.
+        :param heads: The number of attention heads.
+        :param dim_head: The dimension of each attention head.
+        :param causal: Whether to use causal attention or not.
+        :param q_bucket_size: The memory efficient attention parameter for query.
+        :param k_bucket_size: The memory efficient attention parameter for key.
+        :param parallel: Whether to use parallelization or not.
+        :param mixed_precision: Whether to use mixed precision training or not.
+        :return: A FlashAttention instance.
+        """
         super().__init__()
         self.heads = heads
         self.causal = causal
@@ -53,6 +66,16 @@ class FlashAttention(nn.Module):
         q_bucket_size=None,
         k_bucket_size=None,
     ):
+        """
+        Applies the FlashAttention module to the input data.
+
+        :param x: The input data.
+        :param context: The context data.
+        :param mask: The attention mask.
+        :param q_bucket_size: The memory efficient attention parameter for query.
+        :param k_bucket_size: The memory efficient attention parameter for key.
+        :return: The output of the FlashAttention module.
+        """
         q_bucket_size = default(q_bucket_size, self.q_bucket_size)
         k_bucket_size = default(k_bucket_size, self.k_bucket_size)
 
@@ -87,14 +110,16 @@ class FlashAttention(nn.Module):
 
 
 class MSA(torch.nn.Module):
-    """
-    This is the template implementation of the "Multi-Scale Attention" Layer.
-
-    The query, key and value mapping are matrix-multipled against each other in order to
-    find the attention, or, the relation of a word and its interaction with surrounding words.
-    """
 
     def __init__(self, d, n_heads=4, type: str = "vanilla"):
+        """
+        __init__ method for MSA.
+
+        :param d: The embedding dimension (channels) of the input data.
+        :param n_heads: The number of attention heads.
+        :param type: The type of mapping to be used in the attention mechanism.
+        :return: A MSA instance.
+        """
         super(MSA, self).__init__()
         self.d = d
         self.n_heads = n_heads
@@ -154,6 +179,12 @@ class MSA(torch.nn.Module):
         self.softmax = torch.nn.Softmax(dim=-1)
 
     def forward(self, sequences):
+        """
+        Computes the multi-head attention for the given sequences.
+
+        :param sequences: The input sequences.
+        :return: The output of the multi-head attention.
+        """
         result = []
         for sequence in sequences:
             seq_result = []
