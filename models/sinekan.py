@@ -24,7 +24,7 @@ def forward_step(i_n, grid_size, A, K, C):
 
 
 class SineKANLayer(torch.nn.Module):
-    def __init__(self, input_dim, output_dim, device='cuda', grid_size=5, is_first=False, add_bias=True, norm_freq=True):
+    def __init__(self, input_dim, output_dim, device='cpu', grid_size=5, is_first=False, add_bias=True, norm_freq=True):
         """
         Initializes the SineKAN layer.
 
