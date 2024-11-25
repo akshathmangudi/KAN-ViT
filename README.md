@@ -1,4 +1,4 @@
-# A Detailed Investigation into KAN-based Vision Transformers. 
+# ViKANformer: Embedding Kolmogorov–Arnold Networks in Vision Transformers for Pattern-based Learning
 
 This is the official repository containing all details and code related to the project currently in progress, which is benchmarking KAN-based Vision Transformers versus the vanilla Vision Transformers from this [paper](https://arxiv.org/abs/2010.11929).
 
