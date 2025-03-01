@@ -77,7 +77,7 @@ def save_metrics(filename, epoch, phase, loss, accuracy, balanced_accuracy, f1, 
     number is included in the log entry; otherwise, it is omitted.
     """
     os.makedirs('logs', exist_ok=True)
-    with open(f'logs/{filename}', 'a') as f:
+    with open(filename, 'a') as f:
         if flag == 0:
             f.write(f"Epoch: {epoch}, Phase: {phase}\n")
             f.write(f"  Loss: {loss:.4f}\n")
