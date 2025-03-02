@@ -7,7 +7,7 @@ from models.effkan import KANLinear
 from models.sinekan import SineKANLayer
 from models.cheby import ChebyKANLayer
 from models.fastkan import FastKANLayer
-from utils import FlashAttentionFunction, default
+from utils import default, FlashAttentionFunction  # from your local utils or wherever it's defined
 
 
 class FlashAttention(nn.Module):
@@ -23,19 +23,6 @@ class FlashAttention(nn.Module):
         parallel=False,
         mixed_precision=False
     ):
-        """
-        __init__ method for FlashAttention.
-
-        :param dim: The embedding dimension (channels) of the input data.
-        :param heads: The number of attention heads.
-        :param dim_head: The dimension of each attention head.
-        :param causal: Whether to use causal attention or not.
-        :param q_bucket_size: The memory efficient attention parameter for query.
-        :param k_bucket_size: The memory efficient attention parameter for key.
-        :param parallel: Whether to use parallelization or not.
-        :param mixed_precision: Whether to use mixed precision training or not.
-        :return: A FlashAttention instance.
-        """
         super().__init__()
         self.heads = heads
         self.causal = causal
@@ -48,8 +35,6 @@ class FlashAttention(nn.Module):
         self.to_kv = nn.Linear(dim, inner_dim * 2, bias=False)
         self.to_out = nn.Linear(inner_dim, dim, bias=False)
 
-        # memory efficient attention related parameters
-        # can be overriden on forward
         self.q_bucket_size = q_bucket_size
         self.k_bucket_size = k_bucket_size
 
@@ -66,16 +51,6 @@ class FlashAttention(nn.Module):
         q_bucket_size=None,
         k_bucket_size=None,
     ):
-        """
-        Applies the FlashAttention module to the input data.
-
-        :param x: The input data.
-        :param context: The context data.
-        :param mask: The attention mask.
-        :param q_bucket_size: The memory efficient attention parameter for query.
-        :param k_bucket_size: The memory efficient attention parameter for key.
-        :return: The output of the FlashAttention module.
-        """
         q_bucket_size = default(q_bucket_size, self.q_bucket_size)
         k_bucket_size = default(k_bucket_size, self.k_bucket_size)
 
@@ -89,7 +64,6 @@ class FlashAttention(nn.Module):
             t, 'b n (h d) -> b h n d', h=h), (q, k, v))
 
         if self.parallel:
-            # Split the input data into chunks and move each chunk to the correct GPU
             num_gpus = torch.cuda.device_count()
             x_chunks = x.split(x.size(0) // num_gpus)
             x_chunks = [chunk.to(f'cuda:{i}')
@@ -97,7 +71,6 @@ class FlashAttention(nn.Module):
             q = x_chunks
 
         if self.mixed_precision:
-            # Use autocast to allow operations to run in lower precision
             with autocast():
                 out = FlashAttentionFunction.apply(
                     q, k, v, mask, self.causal, q_bucket_size, k_bucket_size)
@@ -109,83 +82,63 @@ class FlashAttention(nn.Module):
         return self.to_out(out)
 
 
-class MSA(torch.nn.Module):
+class MSA(nn.Module):
+    """
+    Example multi-head attention that can use KAN-based mappings or vanilla linear.
+    """
 
     def __init__(self, d, n_heads=4, type: str = "vanilla"):
-        """
-        __init__ method for MSA.
-
-        :param d: The embedding dimension (channels) of the input data.
-        :param n_heads: The number of attention heads.
-        :param type: The type of mapping to be used in the attention mechanism.
-        :return: A MSA instance.
-        """
         super(MSA, self).__init__()
         self.d = d
         self.n_heads = n_heads
+        assert d % n_heads == 0
 
-        assert d % n_heads == 0  # Shouldn't divide dimension (d) into n_heads
+        d_head = d // n_heads
 
-        d_head = int(d / n_heads)
-
-        """
-        KANLinear, FastKANLayer, SineKANLayer, ChebyKANLayer have been adopted from the 
-        respective submodules linked inside the repo. Credit can be viewed inside model.py
-        """
-        try:
-            if type in ["vanilla", "flash-attn", "fourier"]:
-                self.q_mappings = torch.nn.ModuleList(
-                    [torch.nn.Linear(d_head, d_head) for _ in range(self.n_heads)])
-                self.k_mappings = torch.nn.ModuleList(
-                    [torch.nn.Linear(d_head, d_head) for _ in range(self.n_heads)])
-                self.v_mappings = torch.nn.ModuleList(
-                    [torch.nn.Linear(d_head, d_head) for _ in range(self.n_heads)])
-            elif type == "efficientkan":
-                self.q_mappings = torch.nn.ModuleList(
-                    [KANLinear(d_head, d_head) for _ in range(self.n_heads)])
-                self.k_mappings = torch.nn.ModuleList(
-                    [KANLinear(d_head, d_head) for _ in range(self.n_heads)])
-                self.v_mappings = torch.nn.ModuleList(
-                    [KANLinear(d_head, d_head) for _ in range(self.n_heads)])
-            elif type == "fast":
-                self.q_mappings = torch.nn.ModuleList(
-                    [FastKANLayer(d_head, d_head) for _ in range(self.n_heads)])
-                self.k_mappings = torch.nn.ModuleList(
-                    [FastKANLayer(d_head, d_head) for _ in range(self.n_heads)])
-                self.v_mappings = torch.nn.ModuleList(
-                    [FastKANLayer(d_head, d_head) for _ in range(self.n_heads)])
-            elif type == "sine":
-                self.q_mappings = torch.nn.ModuleList(
-                    [SineKANLayer(d_head, d_head, grid_size=4) for _ in range(self.n_heads)])
-                self.k_mappings = torch.nn.ModuleList(
-                    [SineKANLayer(d_head, d_head, grid_size=4) for _ in range(self.n_heads)])
-                self.v_mappings = torch.nn.ModuleList(
-                    [SineKANLayer(d_head, d_head, grid_size=4) for _ in range(self.n_heads)])
-            elif type == "cheby":
-                self.q_mappings = torch.nn.ModuleList(
-                    [ChebyKANLayer(d_head, d_head, 4) for _ in range(self.n_heads)])
-                self.k_mappings = torch.nn.ModuleList(
-                    [ChebyKANLayer(d_head, d_head, 4) for _ in range(self.n_heads)])
-                self.v_mappings = torch.nn.ModuleList(
-                    [ChebyKANLayer(d_head, d_head, 4) for _ in range(self.n_heads)])
-            else:
-                raise ValueError(
-                    f"{type} invalid. Please use a different argument.")
-        except Exception as e:
-            print(
-                f"Error initializing MSA with the following arguments: {type}, {d}, {n_heads}.")
+        if type in ["vanilla", "flash-attn", "fourier"]:
+            self.q_mappings = nn.ModuleList(
+                [nn.Linear(d_head, d_head) for _ in range(n_heads)])
+            self.k_mappings = nn.ModuleList(
+                [nn.Linear(d_head, d_head) for _ in range(n_heads)])
+            self.v_mappings = nn.ModuleList(
+                [nn.Linear(d_head, d_head) for _ in range(n_heads)])
+        elif type == "efficientkan":
+            self.q_mappings = nn.ModuleList(
+                [KANLinear(d_head, d_head) for _ in range(n_heads)])
+            self.k_mappings = nn.ModuleList(
+                [KANLinear(d_head, d_head) for _ in range(n_heads)])
+            self.v_mappings = nn.ModuleList(
+                [KANLinear(d_head, d_head) for _ in range(n_heads)])
+        elif type == "fast":
+            self.q_mappings = nn.ModuleList(
+                [FastKANLayer(d_head, d_head) for _ in range(n_heads)])
+            self.k_mappings = nn.ModuleList(
+                [FastKANLayer(d_head, d_head) for _ in range(n_heads)])
+            self.v_mappings = nn.ModuleList(
+                [FastKANLayer(d_head, d_head) for _ in range(n_heads)])
+        elif type == "sine":
+            self.q_mappings = nn.ModuleList(
+                [SineKANLayer(d_head, d_head, grid_size=4) for _ in range(n_heads)])
+            self.k_mappings = nn.ModuleList(
+                [SineKANLayer(d_head, d_head, grid_size=4) for _ in range(n_heads)])
+            self.v_mappings = nn.ModuleList(
+                [SineKANLayer(d_head, d_head, grid_size=4) for _ in range(n_heads)])
+        elif type == "cheby":
+            self.q_mappings = nn.ModuleList(
+                [ChebyKANLayer(d_head, d_head, 4) for _ in range(n_heads)])
+            self.k_mappings = nn.ModuleList(
+                [ChebyKANLayer(d_head, d_head, 4) for _ in range(n_heads)])
+            self.v_mappings = nn.ModuleList(
+                [ChebyKANLayer(d_head, d_head, 4) for _ in range(n_heads)])
+        else:
+            raise ValueError(f"{type} invalid. Please use a different argument.")
 
         self.d_head = d_head
-        self.softmax = torch.nn.Softmax(dim=-1)
+        self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, sequences):
-        """
-        Computes the multi-head attention for the given sequences.
-
-        :param sequences: The input sequences.
-        :return: The output of the multi-head attention.
-        """
         result = []
+        # sequences => (batch_size, n_tokens, d)
         for sequence in sequences:
             seq_result = []
             for head in range(self.n_heads):
@@ -193,10 +146,12 @@ class MSA(torch.nn.Module):
                 k_mapping = self.k_mappings[head]
                 v_mapping = self.v_mappings[head]
 
+                # slice for one head
                 seq = sequence[:, head * self.d_head: (head + 1) * self.d_head]
                 q, k, v = q_mapping(seq), k_mapping(seq), v_mapping(seq)
 
                 attention = self.softmax(q @ k.T / (self.d_head ** 0.5))
                 seq_result.append(attention @ v)
+            # concat across heads
             result.append(torch.hstack(seq_result))
         return torch.cat([torch.unsqueeze(r, dim=0) for r in result])
