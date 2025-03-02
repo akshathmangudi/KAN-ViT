@@ -3,13 +3,15 @@ import torch
 import datetime
 import argparse
 import logging
+import matplotlib.pyplot as plt
 from torch.optim import Adam
 from tqdm import tqdm, trange
 from torchvision import transforms
-from model import VisionTransformer
 from torch.utils.data import DataLoader
 from torchvision.datasets import MNIST
-from utils import calculate_metrics, save_metrics, setup_logging
+
+from model import VisionTransformer
+from utils import calculate_metrics, save_metrics, setup_logging, plot_all_curves
 
 
 def main(train_loader, test_loader, args):
@@ -17,7 +19,6 @@ def main(train_loader, test_loader, args):
     logging.info(f"Using device: {device}" +
                  (f" ({torch.cuda.get_device_name(device)})" if torch.cuda.is_available() else ""))
 
-    # Build model
     mnist_model = VisionTransformer(
         chw=(1, 28, 28),
         n_patches=7,
@@ -33,74 +34,105 @@ def main(train_loader, test_loader, args):
 
     metrics_log_filename = setup_logging(args.log_dir)
 
-    for epoch in trange(args.epochs, desc="train"):
-        train_loss = 0.0
+    # For plotting
+    train_losses, test_losses = [], []
+    train_accs, test_accs = [], []
+    train_balaccs, test_balaccs = [], []
+    train_f1s, test_f1s = [], []
+    train_aucs, test_aucs = [], []
+
+    epochs_list = list(range(1, args.epochs + 1))
+
+    for epoch in trange(args.epochs, desc="Train Epochs"):
+        mnist_model.train()
+        train_loss_epoch = 0.0
         y_true_train, y_pred_train, y_pred_proba_train = [], [], []
 
-        mnist_model.train()
-        for batch in tqdm(train_loader, desc=f"Epoch {epoch + 1} in training", leave=False):
+        for batch in tqdm(train_loader, desc=f"Epoch {epoch + 1} [train]", leave=False):
             x, y = batch
             x, y = x.to(device), y.to(device)
+
+            optimizer.zero_grad()
             y_hat = mnist_model(x)
             loss = criterion(y_hat, y)
-
-            train_loss += loss.detach().cpu().item() / len(train_loader)
-            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+
+            train_loss_epoch += loss.detach().cpu().item()
 
             y_true_train.extend(y.cpu().numpy())
             y_pred_train.extend(torch.argmax(y_hat, dim=1).cpu().numpy())
             y_pred_proba_train.extend(torch.nn.functional.softmax(y_hat, dim=1).detach().cpu().numpy())
 
+        train_loss_epoch /= len(train_loader)
         accuracy, balanced_accuracy, f1, roc_auc = calculate_metrics(
-            y_true_train, y_pred_train, y_pred_proba_train)
+            y_true_train, y_pred_train, y_pred_proba_train
+        )
 
-        logging.info(f"Epoch {epoch + 1}/{args.epochs}")
-        logging.info(f"  Train Loss: {train_loss:.4f}")
-        logging.info(f"  Train Accuracy: {accuracy:.4f}")
-        logging.info(f"  Train Balanced Accuracy: {balanced_accuracy:.4f}")
-        logging.info(f"  Train F1 Score: {f1:.4f}")
-        logging.info(f"  Train ROC AUC: {roc_auc:.4f}")
+        logging.info(f"Epoch {epoch + 1}/{args.epochs} => TRAIN")
+        logging.info(f"  Loss: {train_loss_epoch:.4f}, Acc: {accuracy:.4f}, BalAcc: {balanced_accuracy:.4f}, "
+                     f"F1: {f1:.4f}, ROC-AUC: {roc_auc:.4f}")
 
-        if epoch == args.epochs - 1:
-            save_metrics(metrics_log_filename, epoch + 1, "Train",
-                         train_loss, accuracy, balanced_accuracy, f1, roc_auc, flag=0)
+        # Save train metrics to file
+        save_metrics(metrics_log_filename, epoch + 1, "Train",
+                     train_loss_epoch, accuracy, balanced_accuracy, f1, roc_auc, flag=0)
 
-    # Testing
-    mnist_model.eval()
-    with torch.no_grad():
-        test_loss = 0.0
-        y_true_test, y_pred_test, y_pred_proba_test = [], [], []
+        # store for plotting
+        train_losses.append(train_loss_epoch)
+        train_accs.append(accuracy)
+        train_balaccs.append(balanced_accuracy)
+        train_f1s.append(f1)
+        train_aucs.append(roc_auc)
 
-        for batch in tqdm(test_loader, desc="Testing"):
-            x, y = batch
-            x, y = x.to(device), y.to(device)
-            y_hat = mnist_model(x)
-            loss = criterion(y_hat, y)
-            test_loss += loss.detach().cpu().item() / len(test_loader)
+        # --- Evaluate on test set ---
+        mnist_model.eval()
+        with torch.no_grad():
+            test_loss_epoch = 0.0
+            y_true_test, y_pred_test, y_pred_proba_test = [], [], []
 
-            y_true_test.extend(y.cpu().numpy())
-            y_pred_test.extend(torch.argmax(y_hat, dim=1).cpu().numpy())
-            y_pred_proba_test.extend(torch.nn.functional.softmax(y_hat, dim=1).cpu().numpy())
+            for batch in tqdm(test_loader, desc=f"Epoch {epoch + 1} [test]", leave=False):
+                x, y = batch
+                x, y = x.to(device), y.to(device)
+                y_hat = mnist_model(x)
+                loss = criterion(y_hat, y)
+                test_loss_epoch += loss.detach().cpu().item()
 
-        accuracy, balanced_accuracy, f1, roc_auc = calculate_metrics(
-            y_true_test, y_pred_test, y_pred_proba_test)
+                y_true_test.extend(y.cpu().numpy())
+                y_pred_test.extend(torch.argmax(y_hat, dim=1).cpu().numpy())
+                y_pred_proba_test.extend(torch.nn.functional.softmax(y_hat, dim=1).cpu().numpy())
 
-        logging.info("Test Results:")
-        logging.info(f"  Test Loss: {test_loss:.4f}")
-        logging.info(f"  Test Accuracy: {accuracy:.4f}")
-        logging.info(f"  Test Balanced Accuracy: {balanced_accuracy:.4f}")
-        logging.info(f"  Test F1 Score: {f1:.4f}")
-        logging.info(f"  Test ROC AUC: {roc_auc:.4f}")
+            test_loss_epoch /= len(test_loader)
+            accuracy_test, balanced_accuracy_test, f1_test, roc_auc_test = calculate_metrics(
+                y_true_test, y_pred_test, y_pred_proba_test
+            )
 
-        save_metrics(metrics_log_filename, args.epochs, "Test", test_loss,
-                     accuracy, balanced_accuracy, f1, roc_auc, flag=1)
+            logging.info(f"Epoch {epoch + 1}/{args.epochs} => TEST")
+            logging.info(f"  Loss: {test_loss_epoch:.4f}, Acc: {accuracy_test:.4f}, BalAcc: {balanced_accuracy_test:.4f}, "
+                         f"F1: {f1_test:.4f}, ROC-AUC: {roc_auc_test:.4f}")
+
+            save_metrics(metrics_log_filename, epoch + 1, "Test",
+                         test_loss_epoch, accuracy_test, balanced_accuracy_test, f1_test, roc_auc_test, flag=1)
+
+            test_losses.append(test_loss_epoch)
+            test_accs.append(accuracy_test)
+            test_balaccs.append(balanced_accuracy_test)
+            test_f1s.append(f1_test)
+            test_aucs.append(roc_auc_test)
+
+    # After all epochs, generate plots
+    plot_all_curves(
+        epochs_list,
+        train_losses, test_losses,
+        train_accs, test_accs,
+        train_balaccs, test_balaccs,
+        train_f1s, test_f1s,
+        train_aucs, test_aucs
+    )
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Benchmark KAN-based Vision Transformers')
-    parser.add_argument('--epochs', type=int, default=20,  # increased from 5 to 20
+    parser = argparse.ArgumentParser(description='Benchmark KAN-based Vision Transformers on MNIST')
+    parser.add_argument('--epochs', type=int, default=20,
                         help='number of epochs to train')
     parser.add_argument('--batch-size', type=int, default=128,
                         help='batch size for training')
@@ -110,10 +142,10 @@ if __name__ == "__main__":
                         default='cuda' if torch.cuda.is_available() else 'cpu',
                         help='device to use for training (cuda/cpu)')
     parser.add_argument('--model-type', type=str, default='vanilla',
-                        help='variant to run, e.g.: [vanilla, efficientkan, sine, cheby, fast]')
-    parser.add_argument('--n-blocks', type=int, default=4,   # bigger than 2
+                        help='variant: [vanilla, efficientkan, sine, cheby, fast, flash-attn, fourier]')
+    parser.add_argument('--n-blocks', type=int, default=4,
                         help='number of transformer blocks')
-    parser.add_argument('--d-hidden', type=int, default=64,  # bigger than 8
+    parser.add_argument('--d-hidden', type=int, default=64,
                         help='hidden dimension of each transformer block')
     parser.add_argument('--n-heads', type=int, default=2,
                         help='number of attention heads')
@@ -130,6 +162,4 @@ if __name__ == "__main__":
     train_loader = DataLoader(train_mnist, shuffle=True, batch_size=args.batch_size)
     test_loader = DataLoader(test_mnist, shuffle=False, batch_size=args.batch_size)
 
-    main(train_loader=train_loader,
-         test_loader=test_loader,
-         args=args)
+    main(train_loader=train_loader, test_loader=test_loader, args=args)
