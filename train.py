@@ -8,7 +8,7 @@ from tqdm import tqdm, trange
 from torchvision import transforms
 from model import VisionTransformer
 from torch.utils.data import DataLoader
-from torchvision.datasets import MNIST
+from torchvision.datasets import MNIST, ImageNet
 from utils import calculate_metrics, save_metrics, setup_logging
 
 
@@ -18,8 +18,12 @@ def main(train_loader, test_loader, args):
     logging.info(f"Using device: {device} " +
                  (f"({torch.cuda.get_device_name(device)})" if torch.cuda.is_available() else ""))
 
+    # mnist_model = VisionTransformer(
+    #     (1, 28, 28), n_patches=7, n_blocks=2, d_hidden=8, n_heads=2, out_d=10,
+    #     type=args.model_type).to(device)
+
     mnist_model = VisionTransformer(
-        (1, 28, 28), n_patches=7, n_blocks=2, d_hidden=8, n_heads=2, out_d=10,
+        (3, 224, 224), n_patches=14, n_blocks=12, d_hidden=768, n_heads=12, out_d=1000,
         type=args.model_type).to(device)
 
     criterion = torch.nn.CrossEntropyLoss()
@@ -113,17 +117,39 @@ if __name__ == "__main__":
                         help='directory to store logs')
     args = parser.parse_args()
 
-    transform = transforms.ToTensor()
-    train_mnist = MNIST(root='./mnist', train=True,
-                        download=True, transform=transform)
-    test_mnist = MNIST(root='./mnist', train=False,
-                       download=True, transform=transform)
+    # transform = transforms.ToTensor()
+    # train_mnist = MNIST(root='./mnist', train=True,
+    #                     download=True, transform=transform)
+    # test_mnist = MNIST(root='./mnist', train=False,
+    #                    download=True, transform=transform)
 
-    train_loader = DataLoader(
-        train_mnist, shuffle=True, batch_size=args.batch_size)
-    test_loader = DataLoader(test_mnist, shuffle=False,
-                             batch_size=args.batch_size)
+    # train_loader = DataLoader(
+    #     train_mnist, shuffle=True, batch_size=args.batch_size)
+    # test_loader = DataLoader(test_mnist, shuffle=False,
+    #                          batch_size=args.batch_size)
+    
+    imagenet_train_transforms = transforms.Compose([
+    transforms.RandomResizedCrop(224),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+
+    imagenet_val_transforms = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+
+    # Load datasets
+    imagenet_train = ImageNet(root='./train', transform=imagenet_train_transforms)
+    imagenet_val = ImageNet(root='./test', transform=imagenet_val_transforms)
+
+    # Create DataLoaders
+    train_loader = DataLoader(imagenet_train, batch_size=args.batch_size, shuffle=True, num_workers=8, pin_memory=True)
+    val_loader = DataLoader(imagenet_val, batch_size=args.batch_size, shuffle=False, num_workers=8, pin_memory=True)
 
     main(train_loader=train_loader,
-         test_loader=test_loader,
+         test_loader=val_loader,
          args=args)
