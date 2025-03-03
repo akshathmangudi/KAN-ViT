@@ -13,7 +13,6 @@ from utils import calculate_metrics, save_metrics, setup_logging
 
 
 def main(train_loader, test_loader, args):
-    flag = 0
     device = torch.device(args.device)
     logging.info(f"Using device: {device} " +
                  (f"({torch.cuda.get_device_name(device)})" if torch.cuda.is_available() else ""))
@@ -23,7 +22,7 @@ def main(train_loader, test_loader, args):
     #     type=args.model_type).to(device)
 
     mnist_model = VisionTransformer(
-        (3, 224, 224), n_patches=14, n_blocks=12, d_hidden=768, n_heads=12, out_d=1000,
+        (3, 224, 224), n_patches=14, n_blocks=args.n_blocks, d_hidden=args.d_hidden, n_heads=args.n_heads, out_d=1000,
         type=args.model_type).to(device)
 
     criterion = torch.nn.CrossEntropyLoss()
@@ -49,8 +48,7 @@ def main(train_loader, test_loader, args):
 
             y_true_train.extend(y.cpu().numpy())
             y_pred_train.extend(torch.argmax(y_hat, dim=1).cpu().numpy())
-            y_pred_proba_train.extend(torch.nn.functional.softmax(
-                y_hat, dim=1).detach().cpu().numpy())
+            y_pred_proba_train.extend(torch.nn.functional.softmax(y_hat, dim=1).detach().cpu().numpy())
 
         accuracy, balanced_accuracy, f1, roc_auc = calculate_metrics(
             y_true_train, y_pred_train, y_pred_proba_train)
@@ -64,12 +62,11 @@ def main(train_loader, test_loader, args):
 
         if epoch == args.epochs - 1:
             save_metrics(metrics_log_filename, epoch + 1, "Train",
-                         train_loss, accuracy, balanced_accuracy, f1, roc_auc, flag)
+                         train_loss, accuracy, balanced_accuracy, f1, roc_auc, flag=0)
 
     # Testing
     mnist_model.eval()
     with torch.no_grad():
-        flag = 1
         test_loss = 0.0
         y_true_test, y_pred_test, y_pred_proba_test = [], [], []
 
@@ -82,8 +79,7 @@ def main(train_loader, test_loader, args):
 
             y_true_test.extend(y.cpu().numpy())
             y_pred_test.extend(torch.argmax(y_hat, dim=1).cpu().numpy())
-            y_pred_proba_test.extend(
-                torch.nn.functional.softmax(y_hat, dim=1).cpu().numpy())
+            y_pred_proba_test.extend(torch.nn.functional.softmax(y_hat, dim=1).cpu().numpy())
 
         accuracy, balanced_accuracy, f1, roc_auc = calculate_metrics(
             y_true_test, y_pred_test, y_pred_proba_test)
@@ -96,13 +92,12 @@ def main(train_loader, test_loader, args):
         logging.info(f"  Test ROC AUC: {roc_auc:.4f}")
 
         save_metrics(metrics_log_filename, args.epochs, "Test", test_loss,
-                     accuracy, balanced_accuracy, f1, roc_auc, flag)
+                     accuracy, balanced_accuracy, f1, roc_auc, flag=1)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description='The official repository to benchmark KAN-based Vision Transformers')
-    parser.add_argument('--epochs', type=int, default=5,
+    parser = argparse.ArgumentParser(description='Benchmark KAN-based Vision Transformers')
+    parser.add_argument('--epochs', type=int, default=20,  # increased from 5 to 20
                         help='number of epochs to train')
     parser.add_argument('--batch-size', type=int, default=128,
                         help='batch size for training')
@@ -112,7 +107,13 @@ if __name__ == "__main__":
                         default='cuda' if torch.cuda.is_available() else 'cpu',
                         help='device to use for training (cuda/cpu)')
     parser.add_argument('--model-type', type=str, default='vanilla',
-                        help='the variant to run, options: [vanilla, efficient-kan, fast-kan, fourier-kan, sine-kan, cheby-kan]')
+                        help='variant to run, e.g.: [vanilla, efficientkan, sine, cheby, fast]')
+    parser.add_argument('--n-blocks', type=int, default=4,   # bigger than 2
+                        help='number of transformer blocks')
+    parser.add_argument('--d-hidden', type=int, default=64,  # bigger than 8
+                        help='hidden dimension of each transformer block')
+    parser.add_argument('--n-heads', type=int, default=2,
+                        help='number of attention heads')
     parser.add_argument('--log-dir', type=str, default='logs',
                         help='directory to store logs')
     args = parser.parse_args()
