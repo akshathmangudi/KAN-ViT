@@ -107,7 +107,7 @@ if __name__ == "__main__":
                         default='cuda' if torch.cuda.is_available() else 'cpu',
                         help='device to use for training (cuda/cpu)')
     parser.add_argument('--model-type', type=str, default='vanilla',
-                        help='variant to run, e.g.: [vanilla, efficientkan, sine, cheby, fast]')
+                        help='variant to run, e.g.: [vanilla, efficientkan, sine, fourier, fast]')
     parser.add_argument('--n-blocks', type=int, default=4,   # bigger than 2
                         help='number of transformer blocks')
     parser.add_argument('--d-hidden', type=int, default=64,  # bigger than 8
