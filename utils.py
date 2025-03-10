@@ -40,7 +40,7 @@ def calculate_metrics(y_true, y_pred, y_pred_proba):
     f1 = f1_score(y_true, y_pred, average='weighted')
 
     y_true_bin = torch.nn.functional.one_hot(
-        torch.tensor(y_true), num_classes=10).numpy()
+        torch.tensor(y_true), num_classes=100).numpy()
     roc_auc = roc_auc_score(y_true_bin, y_pred_proba,
                             average='weighted', multi_class='ovr')
 
