@@ -144,8 +144,8 @@ if __name__ == "__main__":
     ])
 
     # Load datasets
-    imagenet_train = ImageNet(root='./train', transform=imagenet_train_transforms)
-    imagenet_val = ImageNet(root='./test', transform=imagenet_val_transforms)
+    imagenet_train = ImageNet(root='./kaggle/working/train', transform=imagenet_train_transforms)
+    imagenet_val = ImageNet(root='./kaggle/working/test', transform=imagenet_val_transforms)
 
     # Create DataLoaders
     train_loader = DataLoader(imagenet_train, batch_size=args.batch_size, shuffle=True, num_workers=8, pin_memory=True)
