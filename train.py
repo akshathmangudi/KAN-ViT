@@ -92,7 +92,7 @@ if __name__ == "__main__":
     parser.add_argument('--model-type', type=str, default='vanilla', help='variant to run')
     parser.add_argument('--n-blocks', type=int, default=8, help='number of transformer blocks')
     parser.add_argument('--d-hidden', type=int, default=64, help='hidden dimension of transformer block')
-    parser.add_argument('--n-heads', type=int, default=4, help='number of attention heads')
+    parser.add_argument('--n-heads', type=int, default=6, help='number of attention heads')
     parser.add_argument('--log-dir', type=str, default='logs', help='directory to store logs')
     args = parser.parse_args()
 
